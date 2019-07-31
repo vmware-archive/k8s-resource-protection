@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: can-do-all-cm
+  annotations:
+    rp.k14s.io/allowed-operations: "CREATE,UPDATE,DELETE,CONNECT"
+data:
+  foo: "foo"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cannot-delete-cm
+  annotations:
+    rp.k14s.io/allowed-operations: "DELETE"
+data:
+  foo: "foo"

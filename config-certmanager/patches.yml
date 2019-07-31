@@ -1,0 +1,33 @@
+#@ load("@ytt:overlay", "overlay")
+
+#@overlay/match by=overlay.subset({"kind": "APIService"})
+---
+metadata:
+  annotations:
+    #@overlay/match missing_ok=True
+    kapp.k14s.io/change-rule: "upsert after upserting cert-manager-deployment"
+    #@overlay/match missing_ok=True
+    kapp.k14s.io/change-rule.0: "delete before deleting cert-manager-deployment"
+
+#@overlay/match by=overlay.subset({"kind": "ValidatingWebhookConfiguration"})
+---
+metadata:
+  annotations:
+    #@overlay/match missing_ok=True
+    kapp.k14s.io/change-rule: "upsert after upserting cert-manager-deployment"
+    #@overlay/match missing_ok=True
+    kapp.k14s.io/change-rule.0: "delete before deleting cert-manager-deployment"
+
+#@overlay/match by=overlay.subset({"kind": "Deployment"}),expects="0+"
+---
+metadata:
+  #@overlay/match missing_ok=True
+  annotations:
+    kapp.k14s.io/change-group: "cert-manager-deployment"
+
+#@overlay/match by=overlay.subset({"kind": "Service"}),expects="0+"
+---
+metadata:
+  #@overlay/match missing_ok=True
+  annotations:
+    kapp.k14s.io/change-group: "cert-manager-deployment"

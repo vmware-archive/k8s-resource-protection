@@ -1,0 +1,6 @@
+#@data/values
+---
+namespace: default
+debug_rules: false
+push_images: true
+image_repo: docker.io/dkalinin/k8s-resource-protection

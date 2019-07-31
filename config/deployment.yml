@@ -1,0 +1,54 @@
+#@ load("@ytt:data", "data")
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rp-webhook
+  namespace: #@ data.values.namespace
+  annotation:
+    kapp.k14s.io/change-group: "rp.k14s.io/webhook-deployment"
+spec:
+  ports:
+  - port: 443
+  selector:
+    app: rp-webhook
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rp-webhook
+  namespace: #@ data.values.namespace
+  annotations:
+    kapp.k14s.io/change-group: "rp.k14s.io/webhook-deployment"
+spec:
+  selector:
+    matchLabels:
+      app: rp-webhook
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: rp-webhook
+    spec:
+      serviceAccount: rp-sa
+      containers:
+      - name: rp
+        image: rp
+        ports:
+        - containerPort: 443
+          name: server
+          protocol: TCP
+        volumeMounts:
+        - mountPath: /tmp/k8s-webhook-server/serving-certs
+          name: cert
+          readOnly: true
+        resources:
+          requests:
+            cpu: 120m
+            memory: 100Mi
+      volumes:
+      - name: cert
+        secret:
+          defaultMode: 420
+          secretName: rp-webhook-server-cert

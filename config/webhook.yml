@@ -1,0 +1,33 @@
+#@ load("@ytt:data", "data")
+
+---
+apiVersion: admissionregistration.k8s.io/v1beta1
+kind: ValidatingWebhookConfiguration
+metadata:
+  name: rp-webhook
+  annotations:
+    certmanager.k8s.io/inject-ca-from: "(@= data.values.namespace @)/rp-webhook-server-cert"
+    kapp.k14s.io/change-rule: "upsert after upserting rp.k14s.io/webhook-deployment"
+    kapp.k14s.io/change-rule.0: "delete before deleting rp.k14s.io/webhook-deployment"
+webhooks:
+- name: allowed-operations-webhook.rp.k14s.io
+  rules:
+  #! Useful when debugging to limit webhook exposure
+  #@ if data.values.debug_rules:
+  - apiGroups: [""]
+    apiVersions: ["v1"]
+    operations: ["*"]
+    resources: ["configmaps"]
+  #@ else:
+  - apiGroups: ["*"]
+    apiVersions: ["*"]
+    operations: ["*"]
+    resources: ["*"]
+  #@ end
+  failurePolicy: Fail
+  clientConfig:
+    #! caBundle is injected by certmanager
+    service:
+      name: rp-webhook
+      namespace: #@ data.values.namespace
+      path: /allowed-operations

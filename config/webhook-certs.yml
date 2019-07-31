@@ -1,0 +1,23 @@
+#@ load("@ytt:data", "data")
+
+apiVersion: certmanager.k8s.io/v1alpha1
+kind: Issuer
+metadata:
+  name: rp-webhook-server-cert-issuer
+  namespace: #@ data.values.namespace
+spec:
+  selfSigned: {}
+---
+apiVersion: certmanager.k8s.io/v1alpha1
+kind: Certificate
+metadata:
+  name: rp-webhook-server-cert
+  namespace: #@ data.values.namespace
+spec:
+  commonName: rp-webhook.(@= data.values.namespace @).svc
+  dnsNames:
+  - rp-webhook.(@= data.values.namespace @).svc.cluster.local
+  issuerRef:
+    kind: Issuer
+    name: rp-webhook-server-cert-issuer
+  secretName: rp-webhook-server-cert

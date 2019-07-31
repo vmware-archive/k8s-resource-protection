@@ -1,0 +1,30 @@
+#@ load("@ytt:data", "data")
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: rp-sa
+  namespace: #@ data.values.namespace
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: rp-cluster-role
+rules:
+- apiGroups: ["*"]
+  resources: ["*"]
+  verbs: ["get"]
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: rp-cluster-role-binding
+subjects:
+- kind: ServiceAccount
+  name: rp-sa
+  namespace: #@ data.values.namespace
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: rp-cluster-role
