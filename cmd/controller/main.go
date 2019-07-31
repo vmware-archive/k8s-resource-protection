@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"os"
 
 	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
@@ -15,6 +16,11 @@ import (
 var log = logf.Log.WithName("k8s-resource-protection")
 
 func main() {
+	var debug bool
+
+	flag.BoolVar(&debug, "debug", false, "Set debug logging")
+	flag.Parse()
+
 	logf.SetLogger(zap.Logger(false))
 	entryLog := log.WithName("entrypoint")
 
@@ -30,7 +36,11 @@ func main() {
 
 	entryLog.Info("registering webhooks to the webhook server")
 	hookServer.Register("/allowed-operations", &webhook.Admission{
-		Handler: loggingWebhookHandler{Handler: &allowedOperationsValidator{}, Log: log.WithName("handlers")},
+		Handler: loggingWebhookHandler{
+			Handler: &allowedOperationsValidator{},
+			Log:     log.WithName("handlers"),
+			Debug:   debug,
+		},
 	})
 
 	entryLog.Info("starting manager")

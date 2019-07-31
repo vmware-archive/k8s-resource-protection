@@ -20,13 +20,16 @@ type ExtendedHandler interface {
 type loggingWebhookHandler struct {
 	Handler ExtendedHandler
 	Log     logr.Logger
+	Debug   bool
 }
 
 func (v loggingWebhookHandler) Handle(ctx context.Context, req admission.Request) admission.Response {
 	resp := v.Handler.Handle(ctx, req)
-	reqBs, _ := json.Marshal(req)
-	respBs, _ := json.Marshal(resp)
-	v.Log.Info(fmt.Sprintf("req: %s resp: %s\n", reqBs, respBs))
+	if v.Debug {
+		reqBs, _ := json.Marshal(req)
+		respBs, _ := json.Marshal(resp)
+		v.Log.Info(fmt.Sprintf("req: %s resp: %s\n", reqBs, respBs))
+	}
 	return resp
 }
 
