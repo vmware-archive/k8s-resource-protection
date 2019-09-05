@@ -1,5 +1,7 @@
 #@ load("@ytt:overlay", "overlay")
 
+#! Order API service and its backing services: related https://github.com/k14s/kapp/issues/12
+
 #@overlay/match by=overlay.subset({"kind": "APIService"})
 ---
 metadata:
@@ -20,6 +22,9 @@ metadata:
 
 #@overlay/match by=overlay.subset({"kind": "Deployment"}),expects="0+"
 ---
+#! update to use apps/v1 so that kapp can wait on Deployment
+#! (https://github.com/k14s/kapp/blob/master/docs/apply-waiting.md)
+apiVersion: apps/v1
 metadata:
   #@overlay/match missing_ok=True
   annotations:
@@ -32,8 +37,21 @@ metadata:
   annotations:
     kapp.k14s.io/change-group: "cert-manager-deployment"
 
+#! Remove _unnecessary_ status blocks as make kapp show CRDs as changed
+
 #@overlay/match by=overlay.all,expects="1+"
 ---
 #@overlay/match missing_ok=True
 #@overlay/remove
 status:
+
+#! API server reformats durations
+
+#@overlay/match by=overlay.subset({"kind": "Certificate", "metadata": {"name": "cert-manager-webhook-ca"}})
+---
+spec:
+  duration: 43800h0m0s
+#@overlay/match by=overlay.subset({"kind": "Certificate", "metadata": {"name": "cert-manager-webhook-webhook-tls"}})
+---
+spec:
+  duration: 8760h0m0s
