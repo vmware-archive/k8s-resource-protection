@@ -31,3 +31,9 @@ metadata:
   #@overlay/match missing_ok=True
   annotations:
     kapp.k14s.io/change-group: "cert-manager-deployment"
+
+#@overlay/match by=overlay.all,expects="1+"
+---
+#@overlay/match missing_ok=True
+#@overlay/remove
+status:
