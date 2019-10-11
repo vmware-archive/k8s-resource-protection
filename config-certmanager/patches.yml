@@ -47,11 +47,11 @@ status:
 
 #! API server reformats durations
 
-#@overlay/match by=overlay.subset({"kind": "Certificate", "metadata": {"name": "cert-manager-webhook-ca"}})
+#@overlay/match by=overlay.subset({"kind": "Certificate", "metadata": {"name": "cert-manager-webhook-ca"}}),missing_ok=True
 ---
 spec:
   duration: 43800h0m0s
-#@overlay/match by=overlay.subset({"kind": "Certificate", "metadata": {"name": "cert-manager-webhook-webhook-tls"}})
+#@overlay/match by=overlay.subset({"kind": "Certificate", "metadata": {"name": "cert-manager-webhook-webhook-tls"}}),missing_ok=True
 ---
 spec:
   duration: 8760h0m0s
