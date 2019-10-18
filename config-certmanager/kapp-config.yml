@@ -1,0 +1,24 @@
+apiVersion: kapp.k14s.io/v1alpha1
+kind: Config
+rebaseRules:
+- path: [webhooks, {allIndexes: true}, clientConfig, caBundle]
+  type: copy
+  sources: [new, existing]
+  resourceMatchers:
+  - apiVersionKindMatcher:
+      apiVersion: admissionregistration.k8s.io/v1beta1
+      kind: MutatingWebhookConfiguration
+- path: [spec, caBundle]
+  type: copy
+  sources: [new, existing]
+  resourceMatchers:
+  - apiVersionKindMatcher:
+      apiVersion: apiregistration.k8s.io/v1beta1
+      kind: APIService
+- path: [spec, service, port]
+  type: copy
+  sources: [new, existing]
+  resourceMatchers:
+  - apiVersionKindMatcher:
+      apiVersion: apiregistration.k8s.io/v1beta1
+      kind: APIService
